@@ -27,10 +27,10 @@ final class FakeDaemon: @unchecked Sendable {
         }
         guard bound == 0, listen(listener, 4) == 0 else { throw EngineError.connection("bind") }
 
-        let (listener, done, finished) = (listener, done, finished)
+        let (server, done, finished) = (listener, done, finished)
         DispatchQueue.global().async { [self] in
             defer { finished.signal() }
-            let connection = accept(listener, nil, nil)
+            let connection = accept(server, nil, nil)
             guard connection >= 0 else { return }
             defer { close(connection) }
             var received: [UInt8] = []
