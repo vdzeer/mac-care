@@ -147,10 +147,11 @@ func autostartItem(
     }
 
     @Test func theEngineIsStartedUnableToDownloadCloudFiles() {
-        #expect(CloudFiles.downloadsAllowed)
+        // A Mac allows downloads by default; a CI runner may not. Either way the policy comes back as it was.
+        let before = CloudFiles.downloadsAllowed
         let inside = CloudFiles.withoutDownloads { CloudFiles.downloadsAllowed }
         #expect(inside == false)
-        #expect(CloudFiles.downloadsAllowed)
+        #expect(CloudFiles.downloadsAllowed == before)
     }
 }
 
