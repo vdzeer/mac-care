@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+# Read-only token: the job only checks out, builds and tests. No secrets.
+# Actions are pinned to commit SHAs; the comment names the release.
+permissions:
+  contents: read
+
+jobs:
+  gates:
+    name: Format, build and test
+    # Apple silicon with the macOS 26 SDK, which the apps need.
+    runs-on: macos-26
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      # The same checks as on a developer's Mac (AGENTS.md, "Gates").
+      - name: Gates
+        run: scripts/gates.sh

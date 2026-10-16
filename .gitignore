@@ -1,0 +1,11 @@
+.build/
+build/
+.swiftpm/
+.DS_Store
+*.xcodeproj
+
+# Not published: agent notes, specs and docs stay on disk only (README screenshots are published)
+AGENTS.md
+/SPEC.md
+/docs/*
+!/docs/screenshots/
