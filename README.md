@@ -1,5 +1,11 @@
 # Tidy and Ward
 
+[![Latest release](https://img.shields.io/github/v/release/vdzeer/mac-care)](https://github.com/vdzeer/mac-care/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/vdzeer/mac-care/total)](https://github.com/vdzeer/mac-care/releases)
+[![CI](https://github.com/vdzeer/mac-care/actions/workflows/ci.yml/badge.svg)](https://github.com/vdzeer/mac-care/actions/workflows/ci.yml)
+[![macOS 26+](https://img.shields.io/badge/platform-macOS%2026%2B-lightgrey)](https://github.com/vdzeer/mac-care#install)
+[![License: MIT](https://img.shields.io/github/license/vdzeer/mac-care)](https://github.com/vdzeer/mac-care/blob/main/LICENSE)
+
 Two small, separate macOS apps that share one codebase:
 
 - **Tidy** frees disk space: caches and build leftovers, apps together with everything they
