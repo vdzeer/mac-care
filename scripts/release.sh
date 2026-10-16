@@ -94,6 +94,8 @@ for name in Tidy Ward; do
 FEED
   # The feed itself is signed too (SURequireSignedFeed): sign_update embeds the signature in it.
   "$SPARKLE_BIN/sign_update" "$feed"
+  # The app is in the disk image now; a loose copy in build/ would show up as a second app.
+  rm -rf "$app"
   echo "Release: $ROOT/$dmg and $ROOT/$feed"
   shasum -a 256 "$dmg"
 done

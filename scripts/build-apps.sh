@@ -81,8 +81,10 @@ for exe in Tidy Ward; do
     for _ in {1..100}; do pgrep -xq "$exe" || break; sleep 0.1; done
     pkill -x "$exe" || true
   fi
+  # Moved, not copied: macOS lists every app bundle it finds, so a copy left in build/ would
+  # show up in Spotlight and the app list as a second app.
   rm -rf "$HOME/Applications/$exe.app"
-  cp -R "$BUILD/$exe.app" "$HOME/Applications/$exe.app"
+  mv "$BUILD/$exe.app" "$HOME/Applications/$exe.app"
   echo "Installed: $HOME/Applications/$exe.app"
 done
 

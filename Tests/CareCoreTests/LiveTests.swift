@@ -64,7 +64,7 @@ import Testing
 
     @Test func aFileTheEngineCouldNotCheckIsNotCalledClean() async {
         let down = LiveInspector(home: home.url, engine: DownEngine(), autostart: { [] }) { _ in
-            SignatureInfo(kind: .developer(team: "T", name: "Example Ltd"), notarized: false)
+            SignatureInfo(kind: .developer(team: "T", name: "Example Ltd"), notarized: true)
         }
         let events = await down.inspect(
             [home.path("Downloads/report.pdf"), home.path("Downloads/Tool.app/Contents/MacOS/tool")],
@@ -72,7 +72,16 @@ import Testing
         #expect(events.map(\.verdict) == [.notChecked, .notChecked])
         // What Ward checks itself is still reported.
         #expect(events[1].signer == "Example Ltd")
-        #expect(events[1].notarized == false)
+        #expect(events[1].notarized == true)
+
+        // Its own check still flags an app that Apple did not notarize.
+        let unnotarized = LiveInspector(home: home.url, engine: DownEngine(), autostart: { [] }) { _ in
+            SignatureInfo(kind: .developer(team: "T", name: "Example Ltd"), notarized: false)
+        }
+        let flagged = await unnotarized.inspect(
+            [home.path("Downloads/Tool.app/Contents/MacOS/tool")], places: [.downloads])
+        guard case .flagged(let app) = flagged.first?.verdict else { Issue.record("expected a finding"); return }
+        #expect(app.reason == .notNotarizedApp)
 
         // The engine answered, but could not read the file itself.
         let unreadable = LiveInspector(

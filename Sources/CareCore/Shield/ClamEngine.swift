@@ -208,10 +208,15 @@ public struct ClamClient: ScanEngine, Sendable {
     /// How long a short command (PING, VERSION, RELOAD, SHUTDOWN) may wait for an answer. A hung engine must not
     /// hold up a check or the live protection for good.
     public let answerTimeout: TimeInterval
+    /// A scan may take hours, so it has no time limit of its own. Instead the engine is asked this often whether it
+    /// still answers, with half this time for each answer; three missed answers in a row end the scan.
+    public let heartbeat: TimeInterval
+    static let missedAnswers = 3
 
-    public init(socketPath: String, answerTimeout: TimeInterval = 5) {
+    public init(socketPath: String, answerTimeout: TimeInterval = 5, heartbeat: TimeInterval = 30) {
         self.socketPath = socketPath
         self.answerTimeout = answerTimeout
+        self.heartbeat = heartbeat
     }
 
     public func ping() async -> Bool {
@@ -230,10 +235,27 @@ public struct ClamClient: ScanEngine, Sendable {
         _ = try? await send("SHUTDOWN", timeout: answerTimeout)
     }
 
-    /// Scans a file or a whole folder on several threads and reports everything it finds inside it.
+    /// Scans a file or a whole folder on several threads and reports everything it finds inside it. Throws when
+    /// the engine stops answering, so what it was checking counts as not checked rather than clean.
     public func scan(_ url: URL) async throws -> ClamReply {
         let scanned = Array(Set([url.path, url.resolvingSymlinksInPath().path]))
-        return ClamReply.parse(try await send("MULTISCAN \(url.path)", timeout: nil), scanned: scanned)
+        let (heartbeat, missedAnswers) = (heartbeat, Self.missedAnswers)
+        let text = try await withThrowingTaskGroup(of: String.self) { group in
+            group.addTask { try await send("MULTISCAN \(url.path)", timeout: nil) }
+            group.addTask {
+                var missed = 0
+                while missed < missedAnswers {
+                    try await Task.sleep(for: .seconds(heartbeat))
+                    let answer = try? await send("PING", timeout: heartbeat / 2)
+                    missed = answer == "PONG" ? 0 : missed + 1
+                }
+                throw EngineError.connection("the engine stopped answering")
+            }
+            defer { group.cancelAll() }
+            guard let first = try await group.next() else { throw EngineError.connection("no answer") }
+            return first
+        }
+        return ClamReply.parse(text, scanned: scanned)
     }
 
     func send(_ command: String, timeout: TimeInterval?) async throws -> String {

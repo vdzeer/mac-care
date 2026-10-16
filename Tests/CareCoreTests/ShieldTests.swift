@@ -197,6 +197,22 @@ func autostartItem(
         #expect(findings.map(\.reason) == [.unsignedApp, .brokenSignature])
     }
 
+    /// Only the full check knows about notarization; a quick one (nil) never flags a signed app for it.
+    @Test func flagsASignedAppThatAppleDidNotNotarize() {
+        let apps = ["Checked.app", "Unchecked.app", "Unknown.app"].map { URL(fileURLWithPath: "/Applications/" + $0) }
+        let developer = SignatureInfo.Kind.developer(team: "T", name: "Dev")
+        let findings = Heuristics.findings(forApps: apps) { url in
+            switch url.lastPathComponent {
+            case "Checked.app": SignatureInfo(kind: developer, notarized: true)
+            case "Unchecked.app": SignatureInfo(kind: developer, notarized: false)
+            default: SignatureInfo(kind: developer)
+            }
+        }
+        #expect(findings.map(\.name) == ["Unchecked.app"])
+        #expect(findings.map(\.reason) == [.notNotarizedApp])
+        #expect(findings.map(\.severity) == [.suspicious])
+    }
+
     @Test func quarantineAllTakesOnlyMalwareAndNeverTheseApps() throws {
         let home = try TempHome()
         func app(_ name: String, id: String) throws -> URL {

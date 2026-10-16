@@ -21,6 +21,8 @@ public struct Finding: Sendable, Identifiable, Equatable {
         case brokenSignature
         /// An app with no developer certificate behind it.
         case unsignedApp
+        /// An app signed by a developer that Apple did not notarize: nobody checked it for malware.
+        case notNotarizedApp
 
         var key: String {
             switch self {
@@ -30,6 +32,7 @@ public struct Finding: Sendable, Identifiable, Equatable {
             case .scriptAutostart: "scriptAutostart"
             case .brokenSignature: "brokenSignature"
             case .unsignedApp: "unsignedApp"
+            case .notNotarizedApp: "notNotarizedApp"
             }
         }
     }
@@ -105,12 +108,17 @@ public enum Heuristics {
         }
     }
 
+    /// Only the full check asks about notarization (`notarized` is nil otherwise), so only it flags a signed app
+    /// that Apple did not notarize.
     public static func findings(forApps apps: [URL], inspect: (URL) -> SignatureInfo) -> [Finding] {
         apps.compactMap { app in
-            switch inspect(app).kind {
-            case .broken: Finding(severity: .suspicious, reason: .brokenSignature, url: app)
-            case .unsigned, .adHoc: Finding(severity: .suspicious, reason: .unsignedApp, url: app)
-            case .apple, .developer: nil
+            let signature = inspect(app)
+            switch signature.kind {
+            case .broken: return Finding(severity: .suspicious, reason: .brokenSignature, url: app)
+            case .unsigned, .adHoc: return Finding(severity: .suspicious, reason: .unsignedApp, url: app)
+            case .developer where signature.notarized == false:
+                return Finding(severity: .suspicious, reason: .notNotarizedApp, url: app)
+            case .apple, .developer: return nil
             }
         }
     }

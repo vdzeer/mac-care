@@ -82,6 +82,17 @@ final class FakeDaemon: @unchecked Sendable {
         #expect(await ClamClient(socketPath: silentAgain.path, answerTimeout: 0.3).version() == nil)
     }
 
+    /// The scan itself has no time limit; an engine that stops answering in the middle ends it with an error, so
+    /// what it was checking counts as not checked.
+    @Test func aScanEndsWhenTheEngineStopsAnswering() async throws {
+        let silent = try FakeDaemon(reply: nil)
+        defer { silent.stop() }
+        let client = ClamClient(socketPath: silent.path, heartbeat: 0.2)
+        let started = Date()
+        await #expect(throws: EngineError.self) { try await client.scan(URL(fileURLWithPath: "/scan")) }
+        #expect(Date().timeIntervalSince(started) < 5)
+    }
+
     @Test func aHealthyEngineAnswersPing() async throws {
         let daemon = try FakeDaemon(reply: "PONG\0")
         defer { daemon.stop() }

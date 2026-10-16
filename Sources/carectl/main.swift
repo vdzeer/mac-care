@@ -89,6 +89,7 @@ func reason(_ finding: Finding) -> String {
     case .scriptAutostart: "autostart that runs an inline script"
     case .brokenSignature: "signature no longer matches the file"
     case .unsignedApp: "app without a developer certificate"
+    case .notNotarizedApp: "signed app that Apple did not notarize"
     }
 }
 

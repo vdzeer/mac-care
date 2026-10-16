@@ -136,6 +136,7 @@ enum WardStrings {
             case .scriptAutostart: "Starts by itself and runs a script line that is not in any file"
             case .brokenSignature: "Changed after the developer signed it"
             case .unsignedApp: "App without a developer signature"
+            case .notNotarizedApp: "Signed by a developer, but Apple did not check it for malware"
             }
         }
     }

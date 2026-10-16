@@ -102,8 +102,9 @@ call: they do not come back until you install them again.
 | Autostart & Network | Background services that start by themselves, who signed them, and which apps use the network right now |
 
 Findings come in two levels: **malicious** (a match in the ClamAV signature database) and
-**suspicious** (Ward's own checks of signatures and autostart entries). Suspicious does not mean
-malicious: apps you built yourself are flagged too.
+**suspicious** (Ward's own checks of signatures and autostart entries). A new app that a
+developer signed but Apple did not notarize is suspicious too: nobody checked it for malware.
+Suspicious does not mean malicious: apps you built yourself are flagged too.
 
 What Ward does not do: it does not block apps from opening or block network traffic, it never
 deletes anything by itself, and it never changes settings for you. It is no replacement for the
@@ -114,7 +115,8 @@ while live protection is on; without a network the previous one is used. While l
 is on, ClamAV keeps the database in memory: about 1 GB. Live protection also makes Ward start
 when you log in. A file is checked once it has stopped changing, so a large copy is checked
 once. If the engine stops answering, the screen and the menu bar icon say so and the files are
-marked "not checked" rather than clean. Quarantine All takes only malicious findings; suspicious
+marked "not checked" rather than clean; a long scan asks the engine every 30 seconds and ends
+after three missed answers. Quarantine All takes only malicious findings; suspicious
 ones are yours to decide. Files that are only in iCloud are not downloaded to be scanned.
 
 Apps that open when you log in (the "Open at Login" list) are not shown: since macOS 27 the

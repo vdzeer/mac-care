@@ -229,6 +229,7 @@ extension Finding.Reason {
         case .scriptAutostart: "scriptAutostart"
         case .brokenSignature: "brokenSignature"
         case .unsignedApp: "unsignedApp"
+        case .notNotarizedApp: "notNotarizedApp"
         }
     }
 }
