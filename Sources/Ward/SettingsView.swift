@@ -5,6 +5,7 @@ import SwiftUI
 /// Ward → Settings…: live protection, and what Ward needs to work fully.
 struct SettingsView: View {
     let model: AppModel
+    let updates: Updates
     @State private var hasAccess = FullDiskAccess.isGranted()
 
     var body: some View {
@@ -31,6 +32,7 @@ struct SettingsView: View {
                         ? WardStrings.Settings.engineInstalled : WardStrings.Settings.engineMissing
                 ) { EmptyView() }
             }
+            UpdatesSection(updates: updates, words: WardStrings.Settings.updates)
         }
         .formStyle(.grouped)
         .frame(width: 520)

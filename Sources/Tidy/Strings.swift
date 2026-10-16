@@ -1,4 +1,5 @@
 import CareCore
+import CareUI
 
 /// Every word Tidy shows. Title case for buttons and menu items, sentence case for everything
 /// else; the apostrophe is ’; no exclamation marks.
@@ -379,6 +380,7 @@ enum TidyStrings {
 
     enum Commands {
         static let countAgain = "Count Again"
+        static let checkForUpdates = "Check for Updates…"
     }
 
     enum Permissions {
@@ -401,5 +403,10 @@ enum TidyStrings {
         static let fullDiskAccessNote =
             "Without it Tidy cannot see the Trash, Downloads, Desktop and the data of other apps."
         static let openPrivacy = "Open Privacy Settings"
+        static let updates = UpdateWords(
+            checkAutomatically: "Check for Updates Automatically",
+            installAutomatically: "Install Updates Automatically",
+            note: "Tidy looks for a new version on GitHub once a day and installs it when it is not busy.",
+            checkNow: "Check Now")
     }
 }

@@ -31,10 +31,10 @@ struct TidyApp: App {
         .windowResizability(.contentMinSize)
         .defaultSize(width: Metric.windowWidth, height: Metric.windowHeight)
         .defaultLaunchBehavior(.suppressed)
-        .commands { TidyCommands(model: model) }
+        .commands { TidyCommands(model: model, updates: delegate.updates) }
 
         Settings {
-            SettingsView().tidyLook().dockWhileOpen()
+            SettingsView(updates: delegate.updates).tidyLook().dockWhileOpen()
         }
 
         // Tidy lives here: the panel shows the live numbers, and the app keeps running after its
@@ -49,7 +49,18 @@ struct TidyApp: App {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    let model = AppModel.live()
+    let model: AppModel
+    let updates: Updates
+
+    override init() {
+        let model = AppModel.live()
+        self.model = model
+        // A restart in the middle of removing files would leave the job half done.
+        updates = Updates {
+            model.junk.phase == .cleaning || model.apps.isWorking || model.space.isWorking
+        }
+        super.init()
+    }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         AppLife.recordLaunch()
@@ -74,8 +85,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 /// View: one shortcut per section, and counting again.
 struct TidyCommands: Commands {
     let model: AppModel
+    let updates: Updates
 
     var body: some Commands {
+        CommandGroup(after: .appInfo) {
+            if updates.isAvailable {
+                Button(TidyStrings.Commands.checkForUpdates) { updates.checkNow() }
+            }
+        }
         CommandGroup(before: .sidebar) {
             ForEach(Array(RootView.entries.enumerated()), id: \.offset) { index, entry in
                 Button(entry.title) { model.section = entry.id }

@@ -4,6 +4,7 @@ import SwiftUI
 
 /// Tidy → Settings…: starting at login, and the one permission Tidy needs.
 struct SettingsView: View {
+    let updates: Updates
     @State private var openAtLogin = LoginItem.isOn
     @State private var hasAccess = FullDiskAccess.isGranted()
 
@@ -28,6 +29,7 @@ struct SettingsView: View {
                     Button(TidyStrings.Settings.openPrivacy) { NSWorkspace.shared.open(FullDiskAccess.settingsURL) }
                 }
             }
+            UpdatesSection(updates: updates, words: TidyStrings.Settings.updates)
         }
         .formStyle(.grouped)
         .frame(width: 520)

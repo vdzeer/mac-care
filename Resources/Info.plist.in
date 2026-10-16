@@ -8,7 +8,7 @@
   <key>CFBundleExecutable</key><string>__EXE__</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>__VERSION__</string>
-  <key>CFBundleVersion</key><string>1</string>
+  <key>CFBundleVersion</key><string>__VERSION__</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundleDevelopmentRegion</key><string>en</string>
   <key>LSMinimumSystemVersion</key><string>26.0</string>
@@ -16,6 +16,15 @@
   <!-- The app starts in the menu bar; it shows in the Dock only while one of its windows is open. -->
   <key>LSUIElement</key><true/>
   <key>NSHighResolutionCapable</key><true/>
+  <!-- Sparkle: updates from GitHub Releases. The feed and the disk image are both signed with the
+       key whose public half is here, and checked before anything is opened. Checked once a day,
+       downloaded and installed without asking unless switched off in Settings. -->
+  <key>SUFeedURL</key><string>https://github.com/vdzeer/mac-care/releases/latest/download/__FEED__</string>
+  <key>SUPublicEDKey</key><string>TKloJGj+NIQrRPL2rqj3TYySB6Acj1xFedKQk2vAxys=</string>
+  <key>SURequireSignedFeed</key><true/>
+  <key>SUVerifyUpdateBeforeExtraction</key><true/>
+  <key>SUEnableAutomaticChecks</key><true/>
+  <key>SUAutomaticallyUpdate</key><true/>
   <key>NSHumanReadableCopyright</key><string>© 2026 Vadym Dzerniuk. MIT License.</string>
 </dict>
 </plist>

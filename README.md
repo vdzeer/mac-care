@@ -10,7 +10,7 @@ Two small, separate macOS apps that share one codebase:
 
 Both live in the menu bar. Their window opens when you start them or pick Open from the menu;
 while it is open, the app also shows in the Dock with a full app menu. Neither has an account,
-a server or analytics, and neither sends anything anywhere.
+a server or analytics, and neither sends anything about you or your Mac anywhere.
 
 <p>
   <img src="docs/screenshots/tidy-overview.png" width="420" alt="Tidy: what can be removed">
@@ -27,6 +27,12 @@ Download `Tidy-<version>.dmg` and `Ward-<version>.dmg` from the
 [Releases](https://github.com/vdzeer/mac-care/releases) page and drag the apps to Applications.
 They are signed with a Developer ID and notarized by Apple. Or
 [build them yourself](#build-from-source).
+
+Both apps keep themselves up to date: once a day they read a small feed from the latest
+GitHub release, download a new version from there and install it when the app is not busy,
+with no window open; otherwise when you quit it. An update goes in only when its EdDSA
+signature matches the key built into the app. No system profile is sent. Settings (⌘,) can
+switch automatic checks or installs off, and the app menu has Check for Updates.
 
 Requirements: macOS 26 or later on a Mac with Apple silicon. Ward also needs ClamAV:
 
@@ -117,7 +123,9 @@ link to System Settings → General → Login Items instead.
 
 ## Build from source
 
-You need Xcode 26 or later (Swift 6.2). There are no other dependencies.
+You need Xcode 26 or later (Swift 6.2). The one dependency is
+[Sparkle](https://sparkle-project.org) for updates, fetched by Swift Package Manager at the exact
+version in `Package.swift`.
 
 ```sh
 git clone https://github.com/vdzeer/mac-care.git
@@ -131,8 +139,9 @@ certificates (an Apple Development one is enough) so the permission survives a r
 without it the apps are signed ad hoc.
 
 Checks: `scripts/gates.sh` (formatter in lint mode, a build with warnings as errors, the tests).
-Release: `scripts/release.sh` makes notarized disk images; `scripts/release.sh --check` says
-whether signing and notarization are set up.
+Release: `scripts/release.sh` makes notarized disk images and the update feeds signed with the
+update key; `scripts/release.sh --check` says whether signing, notarization and the key are set
+up.
 
 ## Uninstall
 

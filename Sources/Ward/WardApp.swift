@@ -31,10 +31,10 @@ struct WardApp: App {
         .windowResizability(.contentMinSize)
         .defaultSize(width: Metric.windowWidth, height: Metric.windowHeight)
         .defaultLaunchBehavior(.suppressed)
-        .commands { WardCommands(model: model) }
+        .commands { WardCommands(model: model, updates: delegate.updates) }
 
         Settings {
-            SettingsView(model: model).wardLook().dockWhileOpen()
+            SettingsView(model: model, updates: delegate.updates).wardLook().dockWhileOpen()
         }
 
         // The menu bar item keeps Ward running when its window is closed, so live protection goes on.
@@ -97,7 +97,17 @@ private struct MenuContent: View {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
-    let model = AppModel.live()
+    let model: AppModel
+    let updates: Updates
+
+    override init() {
+        let model = AppModel.live()
+        self.model = model
+        // A restart would cut a scan or a move to or from quarantine short. Live protection comes
+        // back with the new version.
+        updates = Updates { model.shield.isBusy || !model.shield.working.isEmpty }
+        super.init()
+    }
 
     func applicationWillFinishLaunching(_ notification: Notification) {
         AppLife.recordLaunch()
@@ -130,8 +140,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 /// View: one shortcut per section, and a quick scan.
 struct WardCommands: Commands {
     let model: AppModel
+    let updates: Updates
 
     var body: some Commands {
+        CommandGroup(after: .appInfo) {
+            if updates.isAvailable {
+                Button(WardStrings.Commands.checkForUpdates) { updates.checkNow() }
+            }
+        }
         CommandGroup(before: .sidebar) {
             ForEach(Array(RootView.entries.enumerated()), id: \.offset) { index, entry in
                 Button(entry.title) { model.section = entry.id }

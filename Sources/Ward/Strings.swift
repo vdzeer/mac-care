@@ -1,4 +1,5 @@
 import CareCore
+import CareUI
 
 /// Every word Ward shows. Title case for buttons and menu items, sentence case for everything
 /// else; the apostrophe is ’; no exclamation marks.
@@ -321,6 +322,7 @@ enum WardStrings {
 
     enum Commands {
         static let quickScan = "Quick Scan"
+        static let checkForUpdates = "Check for Updates…"
     }
 
     enum Permissions {
@@ -354,6 +356,11 @@ enum WardStrings {
         static let engine = "Scanning engine"
         static let engineInstalled = "ClamAV from Homebrew is installed."
         static let engineMissing = "Install ClamAV with brew install clamav, then open Ward again."
+        static let updates = UpdateWords(
+            checkAutomatically: "Check for Updates Automatically",
+            installAutomatically: "Install Updates Automatically",
+            note: "Ward looks for a new version on GitHub once a day and installs it when it is not scanning.",
+            checkNow: "Check Now")
     }
 
     enum Soon {

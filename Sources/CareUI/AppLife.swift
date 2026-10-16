@@ -7,6 +7,10 @@ import SwiftUI
 public enum AppLife {
     /// The id of the main window scene in both apps.
     public static let mainWindow = "main"
+    /// Posted when the last window closes and the app goes back to the menu bar.
+    public static let allWindowsClosed = Notification.Name("AppLife.allWindowsClosed")
+
+    public static var hasOpenWindows: Bool { openWindows > 0 }
 
     private static var openWindows = 0
     private static var launchedAsLoginItem = false
@@ -45,7 +49,10 @@ public enum AppLife {
 
     fileprivate static func windowDisappeared() {
         openWindows = max(openWindows - 1, 0)
-        if openWindows == 0 { NSApp.setActivationPolicy(.accessory) }
+        if openWindows == 0 {
+            NSApp.setActivationPolicy(.accessory)
+            NotificationCenter.default.post(name: allWindowsClosed, object: nil)
+        }
     }
 }
 
